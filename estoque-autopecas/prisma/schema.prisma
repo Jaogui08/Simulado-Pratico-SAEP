@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id       Int    @id @default(autoincrement())
+  nome     String @db.VarChar(255)
+  email    String @unique @db.VarChar(255)
+  senha    String @db.VarChar(255)
+  movimentacoes Movimentacao[]
+  @@map("Usuario")
+}
+
+model Produto {
+  id             Int     @id @default(autoincrement())
+  codigo         String  @unique @db.VarChar(50)
+  descricao      String  @db.VarChar(255)
+  quantidade     Int     @default(0)
+  valor_unitario Decimal @db.Decimal(10,2)
+  estoque_minimo Int     @default(10)
+  movimentacoes Movimentacao[]
+  @@map("Produto")
+}
+
+model Movimentacao {
+  id                Int      @id @default(autoincrement())
+  produto_id        Int
+  usuario_id        Int
+  tipo              TipoMovimentacao
+  quantidade        Int
+  data_movimentacao DateTime @default(now())
+  produto Produto @relation(fields: [produto_id], references: [id])
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  @@map("Movimentacao")
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+}
